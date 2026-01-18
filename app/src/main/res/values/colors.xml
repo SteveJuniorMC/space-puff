@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="space_background">#0D1B2A</color>
+    <color name="balloon_blue">#4DA6FF</color>
+    <color name="balloon_highlight">#FFFFFF</color>
+    <color name="sharp_red">#FF4444</color>
+    <color name="neutral_gray">#888888</color>
+    <color name="collectable_gold">#FFD700</color>
+    <color name="ui_text">#FFFFFF</color>
+</resources>
