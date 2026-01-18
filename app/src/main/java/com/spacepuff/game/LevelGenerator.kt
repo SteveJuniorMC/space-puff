@@ -33,6 +33,8 @@ class LevelGenerator {
             screenHeight * 0.5f
         )
         val balloon = Balloon(balloonPos, BALLOON_RADIUS)
+        balloon.velocity = randomVelocity(30f, 60f)
+        balloon.angularVelocity = randomAngularVelocity()
         spawnedPositions.add(balloonPos to BALLOON_RADIUS + MIN_SPAWN_DISTANCE)
 
         val obstacles = mutableListOf<Obstacle>()
@@ -43,7 +45,14 @@ class LevelGenerator {
                 screenWidth, screenHeight, radius, spawnedPositions
             )
             if (position != null) {
-                obstacles.add(Obstacle(position, radius, ObstacleType.SHARP))
+                val obstacle = Obstacle(
+                    position = position,
+                    radius = radius,
+                    type = ObstacleType.SHARP,
+                    velocity = randomVelocity(20f, 50f)
+                )
+                obstacle.angularVelocity = randomAngularVelocity()
+                obstacles.add(obstacle)
                 spawnedPositions.add(position to radius + MIN_SPAWN_DISTANCE / 2)
             }
         }
@@ -54,7 +63,14 @@ class LevelGenerator {
                 screenWidth, screenHeight, radius, spawnedPositions
             )
             if (position != null) {
-                obstacles.add(Obstacle(position, radius, ObstacleType.NEUTRAL))
+                val obstacle = Obstacle(
+                    position = position,
+                    radius = radius,
+                    type = ObstacleType.NEUTRAL,
+                    velocity = randomVelocity(20f, 50f)
+                )
+                obstacle.angularVelocity = randomAngularVelocity()
+                obstacles.add(obstacle)
                 spawnedPositions.add(position to radius + MIN_SPAWN_DISTANCE / 2)
             }
         }
@@ -72,6 +88,19 @@ class LevelGenerator {
         }
 
         return Level(balloon, obstacles, collectables)
+    }
+
+    private fun randomVelocity(minSpeed: Float, maxSpeed: Float): Vector2D {
+        val angle = Random.nextFloat() * 2f * Math.PI.toFloat()
+        val speed = Random.nextFloat() * (maxSpeed - minSpeed) + minSpeed
+        return Vector2D(
+            kotlin.math.cos(angle) * speed,
+            kotlin.math.sin(angle) * speed
+        )
+    }
+
+    private fun randomAngularVelocity(): Float {
+        return (Random.nextFloat() - 0.5f) * 3f
     }
 
     private fun findValidPosition(

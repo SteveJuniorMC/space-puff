@@ -20,9 +20,7 @@ abstract class GameObject(
         if (!isActive) return
 
         position = physicsEngine.updatePosition(position, velocity, deltaTime)
-        velocity = physicsEngine.updateVelocity(velocity)
         rotation = physicsEngine.updateRotation(rotation, angularVelocity, deltaTime)
-        angularVelocity = physicsEngine.updateAngularVelocity(angularVelocity)
     }
 
     fun collidesWith(other: GameObject): Boolean {

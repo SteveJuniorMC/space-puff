@@ -45,13 +45,6 @@ data class Vector2D(
 }
 
 class PhysicsEngine {
-    companion object {
-        const val DRAG_COEFFICIENT = 0.99f
-        const val ANGULAR_DRAG = 0.98f
-        const val MIN_VELOCITY = 0.1f
-        const val MIN_ANGULAR_VELOCITY = 0.001f
-    }
-
     fun updatePosition(
         position: Vector2D,
         velocity: Vector2D,
@@ -60,24 +53,8 @@ class PhysicsEngine {
         return position + velocity * deltaTime
     }
 
-    fun updateVelocity(velocity: Vector2D): Vector2D {
-        var newVelocity = velocity * DRAG_COEFFICIENT
-        if (newVelocity.magnitudeSquared() < MIN_VELOCITY * MIN_VELOCITY) {
-            newVelocity = Vector2D.ZERO
-        }
-        return newVelocity
-    }
-
     fun updateRotation(rotation: Float, angularVelocity: Float, deltaTime: Float): Float {
         return rotation + angularVelocity * deltaTime
-    }
-
-    fun updateAngularVelocity(angularVelocity: Float): Float {
-        var newAngularVelocity = angularVelocity * ANGULAR_DRAG
-        if (kotlin.math.abs(newAngularVelocity) < MIN_ANGULAR_VELOCITY) {
-            newAngularVelocity = 0f
-        }
-        return newAngularVelocity
     }
 
     fun applyImpulse(velocity: Vector2D, impulse: Vector2D, mass: Float): Vector2D {
