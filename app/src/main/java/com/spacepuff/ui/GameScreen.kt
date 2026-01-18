@@ -20,6 +20,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.key
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -43,8 +44,7 @@ fun GameScreen() {
     val gameEngine = remember { GameEngine() }
     var gameState by remember { mutableStateOf(gameEngine.gameState) }
     var isInitialized by remember { mutableStateOf(false) }
-
-    val density = LocalDensity.current
+    var frameCount by remember { mutableStateOf(0L) }
 
     Box(
         modifier = Modifier
@@ -68,16 +68,20 @@ fun GameScreen() {
                         lastTime = currentTime
                         gameEngine.update(deltaTime)
                         gameState = gameEngine.gameState
+                        frameCount++
                     }
                 }
             }
 
-            GameCanvas(
-                balloon = gameEngine.balloon,
-                obstacles = gameEngine.obstacles,
-                collectables = gameEngine.collectables,
-                modifier = Modifier.fillMaxSize()
-            )
+            // frameCount forces recomposition each frame
+            key(frameCount) {
+                GameCanvas(
+                    balloon = gameEngine.balloon,
+                    obstacles = gameEngine.obstacles,
+                    collectables = gameEngine.collectables,
+                    modifier = Modifier.fillMaxSize()
+                )
+            }
 
             GameHUD(
                 score = gameState.score,
@@ -187,14 +191,12 @@ fun PuffButton(
                 color = if (canPuff) SpacePuffColors.PuffButton else SpacePuffColors.PuffButton.copy(alpha = 0.5f),
                 shape = CircleShape
             )
-            .pointerInput(canPuff) {
-                if (canPuff) {
-                    detectTapGestures(
-                        onPress = {
-                            onPuff()
-                        }
-                    )
-                }
+            .pointerInput(Unit) {
+                detectTapGestures(
+                    onTap = {
+                        onPuff()
+                    }
+                )
             },
         contentAlignment = Alignment.Center
     ) {
