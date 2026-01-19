@@ -11,6 +11,7 @@ class GameEngine {
     companion object {
         const val FIXED_TIMESTEP = 1f / 60f
         const val MAX_FRAME_TIME = 0.25f
+        const val WORLD_SCALE = 3f // World is 3x screen size
     }
 
     private val physicsEngine = PhysicsEngine()
@@ -35,19 +36,36 @@ class GameEngine {
     var screenHeight: Float = 0f
         private set
 
+    var worldWidth: Float = 0f
+        private set
+
+    var worldHeight: Float = 0f
+        private set
+
+    // Camera position (top-left corner of viewport)
+    var cameraX: Float = 0f
+        private set
+
+    var cameraY: Float = 0f
+        private set
+
     private var accumulator: Float = 0f
 
     fun initialize(width: Float, height: Float) {
         screenWidth = width
         screenHeight = height
+        worldWidth = width * WORLD_SCALE
+        worldHeight = height * WORLD_SCALE
         resetGame()
     }
 
     fun resetGame() {
-        val level = levelGenerator.generateLevel(screenWidth, screenHeight)
+        val level = levelGenerator.generateLevel(worldWidth, worldHeight)
         balloon = level.balloon
         obstacles = level.obstacles
         collectables = level.collectables
+
+        updateCamera()
 
         gameState = GameState(
             status = GameStatus.READY,
@@ -56,6 +74,16 @@ class GameEngine {
             airRemaining = balloon.air
         )
         accumulator = 0f
+    }
+
+    private fun updateCamera() {
+        // Center camera on balloon
+        cameraX = balloon.position.x - screenWidth / 2f
+        cameraY = balloon.position.y - screenHeight / 2f
+
+        // Clamp to world bounds
+        cameraX = cameraX.coerceIn(0f, worldWidth - screenWidth)
+        cameraY = cameraY.coerceIn(0f, worldHeight - screenHeight)
     }
 
     fun startGame() {
@@ -85,10 +113,13 @@ class GameEngine {
 
         obstacles.forEach { it.update(physicsEngine, dt) }
 
-        collisionSystem.checkBoundaryCollision(balloon, screenWidth, screenHeight)
+        // Use world boundaries instead of screen
+        collisionSystem.checkBoundaryCollision(balloon, worldWidth, worldHeight)
         obstacles.forEach {
-            collisionSystem.checkBoundaryCollision(it, screenWidth, screenHeight)
+            collisionSystem.checkBoundaryCollision(it, worldWidth, worldHeight)
         }
+
+        updateCamera()
 
         val results = collisionSystem.checkBalloonCollisions(balloon, obstacles, collectables)
 

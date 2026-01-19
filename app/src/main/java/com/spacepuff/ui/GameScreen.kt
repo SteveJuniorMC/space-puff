@@ -79,6 +79,8 @@ fun GameScreen() {
                     balloon = gameEngine.balloon,
                     obstacles = gameEngine.obstacles,
                     collectables = gameEngine.collectables,
+                    cameraX = gameEngine.cameraX,
+                    cameraY = gameEngine.cameraY,
                     modifier = Modifier.fillMaxSize()
                 )
             }

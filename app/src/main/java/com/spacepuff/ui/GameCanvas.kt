@@ -26,27 +26,29 @@ fun GameCanvas(
     balloon: Balloon,
     obstacles: List<Obstacle>,
     collectables: List<Collectable>,
+    cameraX: Float,
+    cameraY: Float,
     modifier: Modifier = Modifier
 ) {
-    val stars = remember { generateStars(100) }
+    val stars = remember { generateStars(300) }
 
     Canvas(modifier = modifier.fillMaxSize()) {
-        drawStarfield(stars)
+        drawStarfield(stars, cameraX, cameraY)
 
         obstacles.forEach { obstacle ->
             if (obstacle.isActive) {
-                drawObstacle(obstacle)
+                drawObstacle(obstacle, cameraX, cameraY)
             }
         }
 
         collectables.forEach { collectable ->
             if (collectable.isActive) {
-                drawCollectable(collectable)
+                drawCollectable(collectable, cameraX, cameraY)
             }
         }
 
         if (balloon.isActive) {
-            drawBalloon(balloon)
+            drawBalloon(balloon, cameraX, cameraY)
         }
     }
 }
@@ -57,21 +59,22 @@ private fun generateStars(count: Int): List<Pair<Float, Float>> {
     }
 }
 
-private fun DrawScope.drawStarfield(stars: List<Pair<Float, Float>>) {
+private fun DrawScope.drawStarfield(stars: List<Pair<Float, Float>>, cameraX: Float, cameraY: Float) {
+    // Parallax effect - stars move slower than camera
+    val parallax = 0.1f
     stars.forEach { (xRatio, yRatio) ->
-        val x = xRatio * size.width
-        val y = yRatio * size.height
-        val starSize = Random.nextFloat() * 2f + 1f
+        val x = (xRatio * size.width * 3f - cameraX * parallax) % size.width
+        val y = (yRatio * size.height * 3f - cameraY * parallax) % size.height
         drawCircle(
             color = SpacePuffColors.StarField,
-            radius = starSize,
+            radius = 1.5f,
             center = Offset(x, y)
         )
     }
 }
 
-private fun DrawScope.drawBalloon(balloon: Balloon) {
-    val center = Offset(balloon.position.x, balloon.position.y)
+private fun DrawScope.drawBalloon(balloon: Balloon, cameraX: Float, cameraY: Float) {
+    val center = Offset(balloon.position.x - cameraX, balloon.position.y - cameraY)
 
     drawCircle(
         color = SpacePuffColors.BalloonBlue,
@@ -117,8 +120,8 @@ private fun DrawScope.drawBalloon(balloon: Balloon) {
     )
 }
 
-private fun DrawScope.drawObstacle(obstacle: Obstacle) {
-    val center = Offset(obstacle.position.x, obstacle.position.y)
+private fun DrawScope.drawObstacle(obstacle: Obstacle, cameraX: Float, cameraY: Float) {
+    val center = Offset(obstacle.position.x - cameraX, obstacle.position.y - cameraY)
 
     when (obstacle.type) {
         ObstacleType.SHARP -> drawSharpObstacle(center, obstacle.radius, obstacle.spikeCount, obstacle.rotation)
@@ -220,8 +223,8 @@ private fun DrawScope.drawNeutralObstacle(center: Offset, radius: Float, rotatio
     }
 }
 
-private fun DrawScope.drawCollectable(collectable: Collectable) {
-    val center = Offset(collectable.position.x, collectable.position.y)
+private fun DrawScope.drawCollectable(collectable: Collectable, cameraX: Float, cameraY: Float) {
+    val center = Offset(collectable.position.x - cameraX, collectable.position.y - cameraY)
     val scaledRadius = collectable.radius * collectable.pulseScale
 
     drawCircle(

@@ -20,9 +20,9 @@ class LevelGenerator {
         const val MAX_OBSTACLE_RADIUS = 60f
         const val COLLECTABLE_RADIUS = 25f
         const val MIN_SPAWN_DISTANCE = 100f
-        const val SHARP_OBSTACLE_COUNT = 4
-        const val NEUTRAL_OBSTACLE_COUNT = 3
-        const val COLLECTABLE_COUNT = 5
+        const val SHARP_OBSTACLE_COUNT = 12
+        const val NEUTRAL_OBSTACLE_COUNT = 10
+        const val COLLECTABLE_COUNT = 15
     }
 
     fun generateLevel(screenWidth: Float, screenHeight: Float): Level {
