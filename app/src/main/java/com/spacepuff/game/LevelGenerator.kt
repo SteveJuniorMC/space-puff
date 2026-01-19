@@ -100,7 +100,9 @@ class LevelGenerator {
     }
 
     private fun randomAngularVelocity(): Float {
-        return (Random.nextFloat() - 0.5f) * 3f
+        // Avoid slow rotation (-50 to +50 degrees/sec ≈ -0.87 to +0.87 rad/sec)
+        val speed = Random.nextFloat() * 0.63f + 0.87f  // 0.87 to 1.5 rad/sec
+        return if (Random.nextBoolean()) speed else -speed
     }
 
     private fun findValidPosition(
